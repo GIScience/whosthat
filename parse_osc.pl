@@ -101,7 +101,8 @@ sub update_state {
     die "Last state $last is less than DB state $cur" if $cur > $last;
     if( $cur == $last ) {
         print STDERR "Current state is the last, no update needed.\n" if $verbose;
-        exit 0;
+	unlink $lock_file;
+	exit 0;
     }
 
     print STDERR "Last state $cur, updating to state $last\n" if $verbose;
