@@ -17,7 +17,6 @@ $wget =~ s/\s//s;
 my $state_file = dirname(abs_path(__FILE__)).'/state.txt';
 my $stop_file = abs_path(__FILE__);
 $stop_file =~ s/(\.pl|$)/.stop/;
-my $lock_file = dirname(abs_path(__FILE__)).'/whosthat.lock';
 my $help;
 my $verbose;
 my $filename;
@@ -49,10 +48,6 @@ if( $help ) {
   usage();
 }
 
-die "$lock_file found, exiting" if -f $lock_file;
-open LOCK, ">$lock_file" or die "Cannot write to $lock_file";
-close LOCK;
-
 usage("Please specify database and user names") unless $database && $user;
 my $db = DBIx::Simple->connect("DBI:Pg:dbname=$database;host=$dbhost;port=$port", $user, $password, {RaiseError => 1, pg_enable_utf8 => 0});
 create_table() if $clear;
@@ -73,7 +68,6 @@ if( $filename ) {
     usage("Please specify either filename or state.txt URL");
 }
 
-unlink $lock_file;
 
 sub update_state {
     my $state_url = shift;
@@ -101,7 +95,6 @@ sub update_state {
     die "Last state $last is less than DB state $cur" if $cur > $last;
     if( $cur == $last ) {
         print STDERR "Current state is the last, no update needed.\n" if $verbose;
-	unlink $lock_file;
 	exit 0;
     }
 
