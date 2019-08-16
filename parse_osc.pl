@@ -8,7 +8,8 @@ use Getopt::Long;
 use File::Basename;
 use LWP::Simple;
 use IO::Uncompress::Gunzip;
-use DBIx::Simple;
+use DBI;
+use utf8;
 use POSIX;
 use Cwd qw(abs_path);
 
@@ -38,7 +39,7 @@ GetOptions(#'h|help' => \$help,
            'h|host=s' => \$dbhost,
            'u|user=s' => \$user,
            'p|password=s' => \$password,
-           'o|port=s' => \$port,           
+           'o|port=s' => \$port,
            'c|clear' => \$clear,
            's|state=s' => \$state_file,
            'w|wget=s' => \$wget
@@ -49,7 +50,8 @@ if( $help ) {
 }
 
 usage("Please specify database and user names") unless $database && $user;
-my $db = DBIx::Simple->connect("DBI:Pg:dbname=$database;host=$dbhost;port=$port", $user, $password, {RaiseError => 1, pg_enable_utf8 => 0});
+my $db = DBI->connect("DBI:Pg:dbname=$database;host=$dbhost;port=$port", $user, $password, {RaiseError => 1, pg_enable_utf8 => 1});
+$db->do("set client_encoding to 'UTF8';");
 create_table() if $clear;
 my $ua = LWP::UserAgent->new();
 $ua->env_proxy;
@@ -132,7 +134,7 @@ sub process_osc {
                 } else {
                     my $h = {};
                     $h->{uid} = $uid;
-                    $h->{user} = $user;
+                    $h->{user} = Encode::decode_utf8($user);
                     $h->{first} = $time;
                     $h->{last} = $time;
                     $users{$k} = $h;
@@ -142,10 +144,10 @@ sub process_osc {
     }
     print STDERR scalar(keys %users)." users, writing..." if $verbose;
     my $sql_ch = "insert into whosthat (user_id, user_name, date_first, date_last) values(?,?,?,?) on conflict (user_name,user_id) do update set date_last = greatest(whosthat.date_last, EXCLUDED.date_last), date_first = least(whosthat.date_first, EXCLUDED.date_first)";
-    $db->begin;
+    $db->begin_work;
     eval {
         for my $c (values %users) {
-            $db->query($sql_ch, $c->{uid}, $c->{user}, $c->{first}, $c->{last}) or die $db->error;
+            $db->query($sql_ch, undef, $c->{uid}, $c->{user}, $c->{first}, $c->{last}) or die $db->error;
         }
         $db->commit;
     };
