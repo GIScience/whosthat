@@ -147,7 +147,7 @@ sub process_osc {
     $db->begin_work;
     eval {
         for my $c (values %users) {
-            $db->query($sql_ch, undef, $c->{uid}, $c->{user}, $c->{first}, $c->{last}) or die $db->error;
+            $db->do($sql_ch, undef, $c->{uid}, $c->{user}, $c->{first}, $c->{last}) or die $db->error;
         }
         $db->commit;
     };
