@@ -8,7 +8,6 @@ if( isset($_REQUEST['action']) ) {
     if ($db->errorCode()) {
         $result['error'] = "Failed to connect to PostgreSQL: (" . $db->connect_errno . ") " . $db->connect_error;
     } else {
-
         $ids = array();
         if( isset($_REQUEST['id']) && preg_match('/^\d+$/', $_REQUEST['id']) ) {
             $ids[] = $_REQUEST['id'];
