@@ -142,12 +142,13 @@ function refreshId(uid) {
 }
 
 function infoToString(info) {
-    var line = '<div class="info"><div class="header"><div class="info-id">#'+info['id']+'</div> <a href="#" onclick="refreshId('+info['id']+'); return false;">(refresh)</a></div>';
+    var line = '<div class="info"><div class="header"><span class="info-id">#'+info['id']+'</span> <a href="#" onclick="refreshId('+info['id']+'); return false;">(refresh)</a></div>';
     for( var i = 0; i < info['names'].length; i++ ) {
         var name = info['names'][i]['name'];
         name = i + 1 == info['names'].length ? '<a href="'+osmUser+encodeURIComponent(name)+'" target="_blank">'+escapeHtml(name)+'</a>' : escapeHtml(name);
         line += '<div><span class="name">'+name+'</span> <span class="interval">'+normalDate(info['names'][i]['first'])+'&mdash;'+normalDate(info['names'][i]['last'])+'</span></div>';
     }
+    line += '</div>';
     return line;
 }
 
