@@ -1,8 +1,10 @@
+<!DOCTYPE html>
 <html>
 <!-- Whosthat Frontend. Written by Ilya Zverev, licensed WTFPL -->
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Who's That - OSM User Names Database</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <script language="javascript">
 var server = 'https://whosthat.osmz.ru/whosthat.php';
 var osmUser = 'https://www.openstreetmap.org/user/';
@@ -150,9 +152,15 @@ function escapeHtml(str) {
 <style>
     body {
         width: 500px;
-        margin: 8 auto;
+        margin: 8px auto;
         font-family: Verdana, Arial, sans-serif;
         overflow: hidden;
+    }
+    @media (max-width: 516px) {
+        body {
+            width: 100%;
+            margin: 8px;
+        }
     }
     h1 {
         text-align: center;
