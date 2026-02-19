@@ -170,7 +170,7 @@ sub decode_xml_entities {
 }
 
 sub create_table {
-    $db->query("drop table if exists whosthat") or die $db->error;
+    $db->do("drop table if exists whosthat") or die $db->error;
 
     my $sql = <<CREAT1;
 create table whosthat (
@@ -183,7 +183,7 @@ create table whosthat (
 create index idx_name on whosthat (user_name);
 create index idx_last on whosthat (date_last);
 CREAT1
-    $db->query($sql) or die $db->error;
+    $db->do($sql) or die $db->error;
     print STDERR "Database tables were recreated.\n" if $verbose;
 }
 
