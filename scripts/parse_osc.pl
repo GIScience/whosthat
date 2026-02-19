@@ -15,7 +15,6 @@ use Cwd qw(abs_path);
 
 my $wget = `/usr/bin/which wget` || 'wget';
 $wget =~ s/\s//s;
-my $state_file = dirname(abs_path(__FILE__)).'/state.txt';
 my $stop_file = abs_path(__FILE__);
 $stop_file =~ s/(\.pl|$)/.stop/;
 my $help;
@@ -41,7 +40,6 @@ GetOptions(#'h|help' => \$help,
            'p|password=s' => \$password,
            'o|port=s' => \$port,
            'c|clear' => \$clear,
-           's|state=s' => \$state_file,
            'w|wget=s' => \$wget
            ) || usage();
 
@@ -80,20 +78,8 @@ sub update_state {
     die "No sequence number in downloaded state.txt" unless $1;
     my $last = $1;
 
-    if( !-f $state_file ) {
-        # if state file does not exist, create it with the latest state
-        open STATE, ">$state_file" or die "Cannot write to $state_file";
-        print STATE "sequenceNumber=$last\n";
-        close STATE;
-    }
+    my $cur = $db->selectrow_array("select state from whosthat_state") or die $db->error;
 
-    my $cur = $last;
-    open STATE, "<$state_file" or die "Cannot open $state_file";
-    while(<STATE>) {
-        $cur = $1 if /sequenceNumber=(\d+)/;
-    }
-    close STATE;
-    die "No sequence number in file $state_file" if $cur < 0;
     die "Last state $last is less than DB state $cur" if $cur > $last;
     if( $cur == $last ) {
         print STDERR "Current state is the last, no update needed.\n" if $verbose;
@@ -109,9 +95,7 @@ sub update_state {
         process_osc(new IO::Uncompress::Gunzip(*FH));
         close FH;
 
-        open STATE, ">$state_file" or die "Cannot write to $state_file";
-        print STATE "sequenceNumber=$state\n";
-        close STATE;
+        $db->do("update whosthat_state set state=?", undef, $state) or die $db->error;
     }
 }
 
@@ -184,6 +168,10 @@ create index idx_name on whosthat (user_name);
 create index idx_last on whosthat (date_last);
 CREAT1
     $db->do($sql) or die $db->error;
+
+    $db->do("drop table if exists whosthat_state") or die $db->error;
+    $db->do("create table whosthat_state (state bigint not null);") or die $db->error;
+
     print STDERR "Database tables were recreated.\n" if $verbose;
 }
 
@@ -206,7 +194,6 @@ usage: $prog -i osc_file [-z] -d database -u user [-h host] [-p password] [-v]
  -d database  : DB database name.
  -u user      : DB user name.
  -p password  : DB password.
- -s state     : name of state file (default=$state_file).
  -w wget      : full path to wget tool (default=$wget).
  -c           : drop and recreate DB tables.
  -v           : display messages.

@@ -13,9 +13,6 @@ set up hourly replication. Parameters of the script are identical to the
 similar named one in [WHODIDIT](https://github.com/Zverik/whodidit) project.
 
 You can download database backup [here](http://whosthat.osmz.ru/whosthat.tgz).
-It includes a `state.txt` file to put into `scripts/` and a mysql database
-dump. The file is updated weekly:
-replication diffs are processed very fast, so there's no need to do it more often.
 
 ## API
 
