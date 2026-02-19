@@ -12,10 +12,10 @@ dump won't do: it contains only the latest user names). After that just
 set up hourly replication. Parameters of the script are identical to the
 similar named one in [WHODIDIT](https://github.com/Zverik/whodidit) project.
 
-You can download database backup [here](http://whosthat.osmz.ru/whosthat-hourly-71406.sql.gz).
-Number in the file name denotes sequence index which you should put into
-`state.txt` when using hourly updates. This file is updated very seldom:
-replication diffs are processed very fast, so there's no need.
+You can download database backup [here](http://whosthat.osmz.ru/whosthat.tgz).
+It includes a `state.txt` file to put into `scripts/` and a mysql database
+dump. The file is updated weekly:
+replication diffs are processed very fast, so there's no need to do it more often.
 
 ## API
 
@@ -26,12 +26,14 @@ or JSONP (if you specify `jsonp=<name>` parameter). It has following actions:
     It's an array of strings.
   * `action=names`: returns all names for specified users, sorted by date.
     It's an array of hashes: `id` for user id and `names` for an array of user names.
-  * `action=info`: returns detailed information on name changes for specidied users.
+  * `action=info`: returns detailed information on name changes for specified users.
     It's an array of hashes: `id` and `names`, the latter contains array of hashes
     with `name` for user name, `first` for the first spotted usage in database
     and `last` for the last one.
   * `action=recent`: returns 15 last renamings.
     It's an array of hashes with `id`, `date`, `from` and `to` keys.
+  * `action=refresh`: returns current username for a specified user ID directly
+    from OSM API and updates the database. It's an array with a single string.
 
 To specify users, use one of those parameters:
 

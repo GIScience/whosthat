@@ -1,8 +1,10 @@
+<!DOCTYPE html>
 <html>
 <!-- Whosthat Frontend. Written by Ilya Zverev, licensed WTFPL -->
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Who's That - OSM User Names Database</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <script language="javascript">
 var server = '<?php echo $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].dirname($_SERVER['SCRIPT_NAME']).'/whosthat.php'; ?>';
 var osmUser = 'https://www.openstreetmap.org/user/';
@@ -133,13 +135,22 @@ function setId(uid) {
     });
 }
 
+function refreshId(uid) {
+    ajax(server + '?action=refresh&id=' + uid, function(result) {
+        if( result.length > 0 ) {
+            setId(uid);
+        }
+    });
+}
+
 function infoToString(info) {
-    var line = '<div class="info"><div class="info-id">#'+info['id']+'</div>';
+    var line = '<div class="info"><div class="header"><span class="info-id">#'+info['id']+'</span> <a href="#" onclick="refreshId('+info['id']+'); return false;">(refresh)</a></div>';
     for( var i = 0; i < info['names'].length; i++ ) {
         var name = info['names'][i]['name'];
         name = i + 1 == info['names'].length ? '<a href="'+osmUser+encodeURIComponent(name)+'" target="_blank">'+escapeHtml(name)+'</a>' : escapeHtml(name);
         line += '<div><span class="name">'+name+'</span> <span class="interval">'+normalDate(info['names'][i]['first'])+'&mdash;'+normalDate(info['names'][i]['last'])+'</span></div>';
     }
+    line += '</div>';
     return line;
 }
 
@@ -150,9 +161,15 @@ function escapeHtml(str) {
 <style>
     body {
         width: 500px;
-        margin: 8 auto;
+        margin: 8px auto;
         font-family: Verdana, Arial, sans-serif;
         overflow: hidden;
+    }
+    @media (max-width: 516px) {
+        body {
+            width: 100%;
+            margin: 8px;
+        }
     }
     h1 {
         text-align: center;
@@ -188,9 +205,12 @@ function escapeHtml(str) {
         margin-bottom: 2em;
         margin-left: 1em;
     }
-    .info-id {
-        font-weight: bold;
+    .info .header {
         margin-left: -1em;
+    }
+    .info-id {
+        display: inline-block;
+        font-weight: bold;
     }
     .info .name {
         display: inline-block;
