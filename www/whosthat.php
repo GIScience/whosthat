@@ -6,7 +6,7 @@ header('Access-Control-Allow-Origin: *');
 $recent_cache = 'recent.json';
 $result = array();
 if( isset($_REQUEST['action']) ) {
-    $db = new PDO('pgsql:host=' + DB_HOST + ';port=5432;dbname=' + DB_DATABASE, DB_USER, DB_PASSWORD);
+    $db = new PDO('pgsql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_DATABASE, DB_USER, DB_PASSWORD);
     if ($db->errorCode()) {
         $result['error'] = "Failed to connect to PostgreSQL: (" . $db->connect_errno . ") " . $db->connect_error;
     } else {
