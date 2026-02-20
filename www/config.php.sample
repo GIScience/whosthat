@@ -1,5 +1,6 @@
 <?php
 const DB_HOST = 'localhost';
+const DB_PORT = '5432';
 const DB_DATABASE = 'whosthat';
 const DB_USER = 'whosthat';
 const DB_PASSWORD = '';
